@@ -4,7 +4,9 @@ This is an Alfred clone writted in NodeJS with Electron.
 
 This really wasn't created to be used by anyone or for anyone to look at the ugly, horrible mess of code, I just needed somewhere to store it.
 
-This application is also capable of loading plugins (stored in the `~/.welfred/plugins` directory.)
+This application is also capable of loading plugins (stored in the `~/.welfred/plugins` directory).
+
+**Note** When a plugin is added the main window must be refreshed for it to load. Open the search (Option+Space) and refresh with CMD+R.
 
 An example plugin is shown below. This plugin is used to control Spotify.
 
