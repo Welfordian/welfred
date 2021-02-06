@@ -49,7 +49,8 @@ function createPreferencesWindow() {
     webPreferences: {
       nodeIntegration: true,
       enableRemoteModule: true,
-      nativeWindowOpen: true
+      nativeWindowOpen: true,
+      devTools: process.env.NODE_ENV === 'development'
     }
   })
 
@@ -99,6 +100,7 @@ function createWindow () {
     webPreferences: {
       nodeIntegration: true,
       enableRemoteModule: true,
+      devTools: process.env.NODE_ENV === 'development',
       //nativeWindowOpen: true
     }
   });
@@ -220,6 +222,7 @@ ipc.on('open-window', (e, opts) => {
         nodeIntegration: true,
         enableRemoteModule: true,
         nativeWindowOpen: true,
+        devTools: process.env.NODE_ENV === 'development'
       }
     };
 
