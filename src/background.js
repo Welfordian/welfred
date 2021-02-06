@@ -145,6 +145,14 @@ app.on('ready', () => {
 
   createWindow();
 
+  globalShortcut.register('Control+Shift+I', () => {
+    // When the user presses Ctrl + Shift + I, this function will get called
+    // You can modify this function to do other things, but if you just want
+    // to disable the shortcut, you can just return false
+    return false;
+  });
+
+
   globalShortcut.register('Option+Space', function () {
     if (! mainWindow) {
       createWindow();
