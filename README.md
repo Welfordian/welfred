@@ -47,7 +47,7 @@ The file contents would be stored at `~/.welfred/plugins/spotify/index.js`.
                     },
     
                     callback() {
-                        require('electron').shell.openExternal('https://google.com');
+                        alert('This button does nothing! Perhaps authenticate with Spotify to control the player itself and remove AppleScript?');
                     }
                 }
             },
