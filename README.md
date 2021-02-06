@@ -1,4 +1,4 @@
-# Welfred
+# Welfred - MacOS
 
 This is an Alfred clone writted in NodeJS with Electron.
 
