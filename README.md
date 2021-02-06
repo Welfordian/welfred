@@ -6,7 +6,7 @@ This really wasn't created to be used by anyone or for anyone to look at the ugl
 
 This application is also capable of loading plugins (stored in the `~/.welfred/plugins` directory).
 
-**Note** When a plugin is added the main window must be refreshed for it to load. Open the search (Option+Space) and refresh with CMD+R.
+**Note:** When a plugin is added the main window must be refreshed for it to load. Open the search (Option+Space) and refresh with CMD+R.
 
 An example plugin is shown below. This plugin is used to control Spotify.
 
