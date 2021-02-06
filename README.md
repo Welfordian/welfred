@@ -281,7 +281,7 @@ module.exports = (require) => {
 
                     ipcRenderer.send('open-window', {
                         name: 'youtube-player',
-                        url: 'https://youtube-embed-proxy.test/index.vue.html#' + videoId,
+                        url: 'https://welfordian.github.io/youtube-embed-proxy/#' + videoId,
                         width: 470,
                         height: 275,
                         position: 'bottomRight',
