@@ -1,7 +1,7 @@
 <template>
-    <div id="main" @keydown="navigateApps" @keyup.esc.prevent="closeWindow" class="m-4">
+    <div id="main" @keydown="navigateApps" @keyup.esc.prevent="closeWindow" class="m-4" :class="{'bg-gray-800': isDarkMode, 'bg-white': !isDarkMode}">
         <div class="relative flex w-full flex-wrap items-stretch">
-            <input autofocus placeholder="Welfred" @keyup="searchApps" ref="searchTerm" type="text" v-model="searchTerm" class="bg-transparent px-3 py-4 placeholder-gray-400 text-gray-700 relative rounded text-base outline-none focus:outline-none focus:shadow-outline w-full pr-10 text-2xl"/>
+            <input autofocus placeholder="Welfred" @keydown="searchApps" @keyup="searchApps" ref="searchTerm" type="text" v-model="searchTerm" :class="{'text-gray-400 placeholder-gray-500': isDarkMode, 'text-gray-700 placeholder-gray-400': !isDarkMode}" class="bg-transparent px-3 py-4 relative rounded text-base outline-none focus:outline-none focus:shadow-outline w-full pr-10 text-2xl"/>
 
             <span class="leading-normal font-normal absolute text-center text-gray-400 absolute bg-transparent rounded text-lg items-center justify-center w-8 right-0 text-3xl pt-2 pr-2 font-bold text-gray-600">
                 <i class="fab fa-searchengin"></i>
@@ -17,9 +17,12 @@
                         :key="index">
                     <div class="flex items-center cursor-pointer" @mouseenter="setSelectedIndex(index)" @click="selectedHandler(index)">
                         <img class="mr-2" :src="item.image" />
-                        <div>
-                            <p class="flex items-center"><i v-if="'icon' in item" :class="'fas fa-' + item.icon"></i> <span :class="{'ml-2': 'icon' in item}">{{ item.name }}</span></p>
-                            <p class="application-path text-sm pr-3 overflow-ellipsis overflow-hidden whitespace-nowrap w-96">{{ item.path }}</p>
+                        <div class="flex-grow">
+                            <p class="flex items-center" :class="{'text-white': isDarkMode}"><i v-if="'icon' in item" :class="'fas fa-' + item.icon"></i> <span :class="{'ml-2': 'icon' in item}">{{ item.name }}</span></p>
+                            <div class="flex">
+                                <p class="application-path text-sm pr-3 overflow-ellipsis overflow-hidden whitespace-nowrap w-96">{{ item.path }}</p>
+                                <p class="-mt-3 flex-grow text-right pr-4" :class="{'text-gray-400 placeholder-gray-500': isDarkMode, 'text-gray-700 placeholder-gray-400': !isDarkMode}">{{ controlKeyIcon }}{{ index + 1 }}</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -76,11 +79,10 @@
         },
 
         mounted() {
-            ipcRenderer.send('getDirName');
-
-            ipcRenderer.on('gotDirName', (e, data) => {
-                console.log(data);
+            require('electron').remote.systemPreferences.subscribeNotification('AppleInterfaceThemeChangedNotification', () => {
+                this.isDarkMode = require('electron').remote.systemPreferences.isDarkMode();
             });
+
             window.addEventListener('mousemove', event => {
                 if (event.path.includes(document.querySelector('#main')) === false) {
                     setIgnoreMouseEvents(true, {forward: true})   // {forward: true} keeps generating MouseEvents
@@ -100,7 +102,7 @@
             }
 
             window.onblur = () => {
-                //this.closeWindow();
+                this.closeWindow();
             }
 
             window.onerror = e => {
@@ -121,6 +123,7 @@
                 applications: [],
                 searchResults: [],
                 loadedPlugins: {},
+                isDarkMode: require('electron').remote.systemPreferences.isDarkMode(),
             }
         },
 
@@ -140,6 +143,8 @@
                     if (files === undefined) return;
                     
                     files.forEach(f => {
+                        if (f === '.DS_Store') return;
+
                         let pluginName = f.replace('.js', '');
 
                         if (disabledPlugins.indexOf(pluginName) === -1) {
@@ -228,7 +233,55 @@
                 }
             },
 
+            keyboardSelect(e) {
+                if (((require('electron').remote.process.platform !== 'darwin') && e.ctrlKey) || ((require('electron').remote.process.platform === 'darwin') && e.metaKey)) {
+                    if (e.keyCode === 49) { // CTRL+1
+                        if (this.searchResults.length >= 1) {
+                            this.selectedHandler(0);
+                        }
+
+                        return true;
+                    }
+
+                    if (e.keyCode === 50) { // CTRL+2
+                        if (this.searchResults.length >= 2) {
+                            this.selectedHandler(1);
+                        }
+
+                        return true;
+                    }
+
+                    if (e.keyCode === 51) { // CTRL+3
+                        if (this.searchResults.length >= 3) {
+                            this.selectedHandler(2);
+                        }
+
+                        return true;
+                    }
+
+                    if (e.keyCode === 52) { // CTRL+4
+                        if (this.searchResults.length >= 4) {
+                            this.selectedHandler(3);
+                        }
+
+                        return true;
+                    }
+
+                    if (e.keyCode === 53) { // CTRL+5
+                        if (this.searchResults.length >= 5) {
+                            this.selectedHandler(4);
+                        }
+
+                        return true;
+                    }
+                }
+            },
+
             searchApps(e) {
+                if (this.keyboardSelect(e)) {
+                    return;
+                }
+
                 if (e.keyCode === 13) {
                     this.performSearch();
                 }
@@ -328,6 +381,12 @@
 
                 ipcRenderer.send('hideMainWindow');
             }
+        },
+
+        computed: {
+            controlKeyIcon() {
+                return require('electron').remote.process.platform === 'darwin' ? '⌘' : 'CTRL';
+            }
         }
     }
 </script>
@@ -356,10 +415,6 @@
 
     #applicationList::-webkit-scrollbar-track {
         background-color: rgba(0,0,0,0);
-    }
-
-    #main {
-        background: #fffffff2;
     }
 
     .list-item .application-path {

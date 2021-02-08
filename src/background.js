@@ -4,7 +4,11 @@ const path = require('path');
 const ipc = require('electron').ipcMain;
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
-import { autoUpdater } from "electron-updater"
+import { autoUpdater } from "electron-updater";
+const {download} = require("electron-dl");
+const rimraf = require('rimraf');
+
+app.commandLine.appendSwitch ("disable-http-cache");
 
 protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { secure: true, standard: true } }
@@ -48,6 +52,7 @@ function createPreferencesWindow() {
     title: 'Preferences',
     webPreferences: {
       nodeIntegration: true,
+      webSecurity: false,
       enableRemoteModule: true,
       nativeWindowOpen: true,
       devTools: process.env.NODE_ENV === 'development'
@@ -125,7 +130,7 @@ function createWindow () {
         mainWindow.focus();
       });
 
-      mainWindow.webContents.openDevTools();
+      //mainWindow.webContents.openDevTools();
     });
   }
 
@@ -147,12 +152,12 @@ app.on('ready', () => {
 
   createWindow();
 
-  // globalShortcut.register('Control+Shift+I', () => {
-  //   // When the user presses Ctrl + Shift + I, this function will get called
-  //   // You can modify this function to do other things, but if you just want
-  //   // to disable the shortcut, you can just return false
-  //   return false;
-  // });
+  globalShortcut.register('Control+Shift+I', () => {
+    // When the user presses Ctrl + Shift + I, this function will get called
+    // You can modify this function to do other things, but if you just want
+    // to disable the shortcut, you can just return false
+    return false;
+  });
 
 
   globalShortcut.register('Option+Space', function () {
@@ -192,7 +197,12 @@ app.on('activate', () => {
   if (mainWindow === null) {
     createWindow()
   }
-})
+});
+
+ipc.on("download", (event, info) => {
+  download(BrowserWindow.getFocusedWindow(), info.url, info.properties)
+      .then(dl => preferences.webContents.send("download complete", dl.getSavePath()));
+});
 
 ipc.on('getDirName', (e) => {
   e.sender.send('gotDirName', {dirname: __dirname, static: __static});
@@ -200,10 +210,6 @@ ipc.on('getDirName', (e) => {
 
 ipc.on('hideMainWindow', () => {
   mainWindow.hide();
-});
-
-ipc.on('log', (e, l) => {
-  console.log(l);
 });
 
 ipc.on('open-window', (e, opts) => {
@@ -276,6 +282,12 @@ ipc.on('open-window', (e, opts) => {
       delete pluginWindows[opts.name];
     });
   }
+});
+
+ipc.on('delete_plugin', (e, opts) => {
+  rimraf(opts.directory, {}, function () {
+    preferences.webContents.send('plugin_deleted');
+  });
 });
 
 ipc.on('set-touchBar', (e, opts) => {
