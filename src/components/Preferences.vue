@@ -120,12 +120,7 @@
         },
 
         beforeMount() {
-            this.http = axios.create({
-                auth: {
-                    username: 'welfordian',
-                    password: '8fb38d050f43825e19c5e19d289b718952e07624'
-                }
-            });
+            this.http = axios.create();
 
             ipcRenderer.on('plugin_deleted', this.registerPlugins);
             ipcRenderer.on("download complete", this.registerPlugins);
