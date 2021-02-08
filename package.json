@@ -21,6 +21,7 @@
     "electron-settings": "^4.0.2",
     "electron-updater": "^4.3.5",
     "fast-glob": "^2.2.7",
+    "fd-slicer": "^1.1.0",
     "moment": "^2.29.1",
     "vue": "^2.6.11",
     "vue-router": "^3.5.1"

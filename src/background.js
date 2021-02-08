@@ -125,14 +125,16 @@ function createWindow () {
         mainWindow.focus();
       });
 
-      //mainWindow.webContents.openDevTools();
+      mainWindow.webContents.openDevTools();
     });
   }
 
   mainWindow.focus();
 }
 
-app.dock.hide();
+if (process.platform === 'darwin') {
+  app.dock.hide();
+}
 
 app.whenReady().then(() => {
   installExtension(VUEJS_DEVTOOLS)
@@ -145,12 +147,12 @@ app.on('ready', () => {
 
   createWindow();
 
-  globalShortcut.register('Control+Shift+I', () => {
-    // When the user presses Ctrl + Shift + I, this function will get called
-    // You can modify this function to do other things, but if you just want
-    // to disable the shortcut, you can just return false
-    return false;
-  });
+  // globalShortcut.register('Control+Shift+I', () => {
+  //   // When the user presses Ctrl + Shift + I, this function will get called
+  //   // You can modify this function to do other things, but if you just want
+  //   // to disable the shortcut, you can just return false
+  //   return false;
+  // });
 
 
   globalShortcut.register('Option+Space', function () {

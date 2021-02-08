@@ -100,7 +100,7 @@
             }
 
             window.onblur = () => {
-                this.closeWindow();
+                //this.closeWindow();
             }
 
             window.onerror = e => {
@@ -137,6 +137,8 @@
                 }
 
                 fs.readdir(homedir + '/.welfred/plugins', (err, files) => {
+                    if (files === undefined) return;
+                    
                     files.forEach(f => {
                         let pluginName = f.replace('.js', '');
 
@@ -166,6 +168,19 @@
             },
 
             cacheApps() {
+                if (require('electron').remote.process.platform === 'darwin') {
+                    this.findMacApps();
+                } else {
+                    this.findWindowsApp();
+                }
+                
+            },
+
+            findWindowsApp() {
+                
+            },
+
+            findMacApps() {
                 findApps('/Applications', (e, r) => {
                     this.applications = r.map(a => {
                         return {path: a, name: /([^/]+$)/.exec(a)[0].replace('.app', ''), image: ''};
